@@ -19,7 +19,8 @@ function createCard(card){
 
     let cardRegistered=document.createElement('p');
     cardRegistered.classList.add("card-registered");
-    cardRegistered.textContent="Joined " + card.registered.date;
+    let date=new Date(`${card.registered.date}`);
+    cardRegistered.textContent="Joined " + date.toLocaleDateString();
 
 
     containerCard.appendChild(cardImg);
@@ -27,6 +28,15 @@ function createCard(card){
     containerCard.appendChild(cardEmail);
     containerCard.appendChild(cardLine);
     containerCard.appendChild(cardRegistered);
+
+    cardImg.addEventListener("click",(e)=>{
+        e.preventDefault();
+        let modalZone=document.querySelector(".modal"); 
+        
+        modalZone.innerHTML="";
+        modalZone.style.display='flex';      
+        modalZone.appendChild(createModal(card));
+    })
 
     return containerCard;
 }
@@ -39,29 +49,7 @@ function attachCards(cards){
     }
 }
 
-function paginatie(arr,nrOfPage,nrObjects){
-    let index = (nrOfPage*nrObjects)-nrObjects;
-    let objectarr=[];
-    let count=index+nrObjects;
-    for(let i=index;i<count;i++){
-
-        objectarr.push(arr[i]); 
-          
-    }
-    return objectarr;
-}
-
-function countArr(arr){
-    let count=0;
-    for(let i=0;i<arr.length;i++){
-        count++;
-    }
-    return count;
-}
-
-
-function howManyPageWeNeed(arr,nrObjects){
-    let numberOfElements=countArr(arr);
+function howManyPageWeNeed(numberOfElements,nrObjects){
     let numberOfPages=0;
     if(numberOfElements%nrObjects===0){
         numberOfPages=numberOfElements/nrObjects;
@@ -85,20 +73,14 @@ function createButton(pageNumber){
 }
 
 
-function createButtons(arr,nrObject){
+function createButtons(arr,nrObject){       
     let pages=howManyPageWeNeed(arr,nrObject);
     let sectionPages=document.querySelector(".pagination .list");
     for(let i=0;i<pages;i++){
        sectionPages.appendChild(createButton(i+1));
     }
-   
 }
 
-
-function createPage(pageNumber){
-let filters=paginatie(data,pageNumber,6);
-attachCards(filters);
-}
 
 
 function createModal(card){
@@ -119,6 +101,7 @@ function createModal(card){
     prevBtn.classList.add('fa-arrow-left');
     prevBtn.classList.add('prevBtn');
 
+    
     let cardName=document.createElement('p');
     cardName.classList.add('modal-name');
     cardName.textContent=card.name.first+" "+card.name.last;
@@ -145,6 +128,15 @@ function createModal(card){
     buttonEdit.classList.add('edit-modal');
     buttonEdit.textContent='Edit';
 
+    buttonEdit.addEventListener("click",(e)=>{
+        let editContainer=document.querySelector(".edit-container");
+        editContainer.innerHTML=" ";
+        editContainer.style.display='flex';
+        let modalZone=document.querySelector(".modal"); 
+        modalZone.style.display='none';      
+        editContainer.appendChild(editCreate(card));
+    })
+
     let buttonExit=document.createElement('button');
     buttonExit.classList.add('exit-btn');
     buttonExit.textContent='X';
@@ -152,7 +144,20 @@ function createModal(card){
     let buttonDelete=document.createElement('button');
     buttonDelete.classList.add('delete-modal');
     buttonDelete.textContent='Delete';
-   
+    
+    buttonDelete.addEventListener("click",(e)=>{
+      let cardsZone=document.querySelector(".cards");
+      let eCard=createCard(card);
+      for(let i=0;i<cardsZone.childElementCount;i++){
+           let child=cardsZone.children[i];
+        if(child.children[2].textContent===eCard.children[2].textContent){
+            cardsZone.removeChild(cardsZone.children[i]);
+            let modalZone=document.querySelector(".modal"); 
+            modalZone.style.display='none'; 
+        }
+      }
+     
+    })
 
     let cardLine=document.createElement('hr');
     cardLine.classList.add("card-line");
@@ -257,6 +262,15 @@ function editCreate(card){
    
 }
 
+function removeCard(card){
+    let filter=[];
+    for(let i=0;i<arr.length;i++){
+        if(!(arr[i]===card)){
+           filter.push(arr[i]);
+        }
+    }
+    return filter;
+}
 
 function removeByEmail(arr,email){
     let filter=[];
@@ -325,4 +339,32 @@ function sortByEmail(arr){
         }
     }
     return arr;
+}
+
+ async function createPage(num){
+
+
+    try{
+
+
+        let data= await fetch(`https://randomuser.me/api/?page=${num}&results=6&seed=abc`);
+
+        data = await data.json();
+
+        
+        let cards;
+        let cardzone=document.querySelector(".cards");
+        
+
+        for(let i=0;i<data.results.length;i++){
+           cardzone.appendChild(createCard(data.results[i]));
+        }
+
+      
+    }catch(err){
+        console.error(err);
+    }
+   
+
+
 }
