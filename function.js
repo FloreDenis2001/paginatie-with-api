@@ -38,6 +38,8 @@ function createCard(card){
         modalZone.appendChild(createModal(card));
     })
 
+
+
     return containerCard;
 }
 
@@ -101,7 +103,8 @@ function createModal(card){
     prevBtn.classList.add('fa-arrow-left');
     prevBtn.classList.add('prevBtn');
 
-    
+
+
     let cardName=document.createElement('p');
     cardName.classList.add('modal-name');
     cardName.textContent=card.name.first+" "+card.name.last;
@@ -153,10 +156,10 @@ function createModal(card){
         if(child.children[2].textContent===eCard.children[2].textContent){
             cardsZone.removeChild(cardsZone.children[i]);
             let modalZone=document.querySelector(".modal"); 
-            modalZone.style.display='none'; 
+            modalZone.style.display='none';
+             
         }
       }
-     
     })
 
     let cardLine=document.createElement('hr');
@@ -165,11 +168,6 @@ function createModal(card){
     buttons.appendChild(buttonEdit);
     buttons.appendChild(buttonDelete);
     
-
-
-
-
-   
 
     cardModal.appendChild(buttonExit);
     cardModal.appendChild(cardImg);
@@ -180,6 +178,9 @@ function createModal(card){
     cardModal.appendChild(prevBtn);
     cardModal.appendChild(nextBtn);
 
+
+   
+   
 
     return cardModal;
 
@@ -236,12 +237,17 @@ function editCreate(card){
     inputNameCreate.value=card.name.first+" "+card.name.last;
 
 
+
      let saveContainer=document.createElement('div');
      saveContainer.classList.add('save-container');
 
      let btnSave=document.createElement('div');
      btnSave.classList.add('save-btn');
      btnSave.textContent='SAVE';
+
+     btnSave.addEventListener("click",(e)=>{
+
+     })
      
      let btnCancel=document.createElement('div');
      btnCancel.classList.add('cancel-btn');
@@ -341,6 +347,10 @@ function sortByEmail(arr){
     return arr;
 }
 
+
+
+
+
  async function createPage(num){
 
 
@@ -350,21 +360,34 @@ function sortByEmail(arr){
         let data= await fetch(`https://randomuser.me/api/?page=${num}&results=6&seed=abc`);
 
         data = await data.json();
-
-        
-        let cards;
+   
+    
         let cardzone=document.querySelector(".cards");
-        
 
         for(let i=0;i<data.results.length;i++){
            cardzone.appendChild(createCard(data.results[i]));
-        }
-
+        }        
       
     }catch(err){
         console.error(err);
     }
    
-
-
 }
+
+async function prevUser(currentUserEmail){
+     try{
+
+     let dataD= await fetch(`https://randomuser.me/api/?results=5`);
+     dataD = await dataD.json();
+
+     let modalZone=document.querySelector(".modal");
+     modalZone.innerHTML=" ";
+     modalZone.style.display='flex';
+     modalZone.appendChild(createModal(dataD.results[0]));
+    
+    
+    }catch(err){
+        console.error(err);
+     }
+}
+
